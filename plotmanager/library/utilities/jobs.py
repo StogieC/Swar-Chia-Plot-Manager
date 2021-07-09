@@ -18,6 +18,10 @@ def has_active_jobs_and_work(jobs):
             resume_plots = None
         if job.total_kicked_off < job.max_plots:
             return True
+            logging.info(f'Job name 21: {job.name}')
+            logging.info(f'Job total kicked off: {job.total_kicked_off}')
+            logging.info(f'Job max to kick off: {job.max_plots}')
+            logging.info(f'Resume: {job.resume_plots}')
     return False
 
 
@@ -30,6 +34,10 @@ def get_target_directories(job, drives_free_space):
     destination_directory = job.destination_directory
     temporary_directory = job.temporary_directory
     temporary2_directory = job.temporary2_directory
+    logging.info(f'Job name 37: {job.name}')
+    logging.info(f'Job total kicked off: {job.total_kicked_off}')
+    logging.info(f'Job max to kick off: {job.max_plots}')
+    logging.info(f'Resume: {job.resume_plots}')
 
     if not destination_directory:
         return None, None, None, job
@@ -87,6 +95,7 @@ def load_jobs(config_jobs):
 
         job.farmer_public_key = info.get('farmer_public_key', None)
         job.pool_public_key = info.get('pool_public_key', None)
+        job.pool_contract_address = info.get('pool_contract_address', None)
         job.max_concurrent = info['max_concurrent']
         job.max_concurrent_with_start_early = info['max_concurrent_with_start_early']
 
@@ -200,8 +209,10 @@ def monitor_jobs_to_start(jobs, running_work, max_concurrent, max_for_phase_1, n
 
     for i, job in enumerate(jobs):
         logging.info(f'Checking to queue work for job: {job.name}')
+        logging.info(f'Job name 211: {job.name}')
         logging.info(f'Job total kicked off: {job.total_kicked_off}')
         logging.info(f'Job max to kick off: {job.max_plots}')
+        logging.info(f'Resume: {job.resume_plots}')
         if len(running_work.values()) >= max_concurrent:
             logging.info(f'Global concurrent limit met, skipping. Running plots: {len(running_work.values())}, '
                          f'Max global concurrent limit: {max_concurrent}')
@@ -225,6 +236,10 @@ def monitor_jobs_to_start(jobs, running_work, max_concurrent, max_for_phase_1, n
             continue
         if job.name in next_job_work and next_job_work[job.name] > datetime.now():
             logging.info(f'Waiting for job stagger, skipping. Next allowable time: {next_job_work[job.name]}')
+            logging.info(f'Job name 236: {job.name}')
+            logging.info(f'Job total kicked off: {job.total_kicked_off}')
+            logging.info(f'Job max to kick off: {job.max_plots}')
+            logging.info(f'Resume: {job.resume_plots}')
             continue
         discount_running = 0
         if job.concurrency_start_early_phase is not None:
@@ -257,6 +272,10 @@ def monitor_jobs_to_start(jobs, running_work, max_concurrent, max_for_phase_1, n
                 if next_job_work[j.name] > minimum_stagger:
                     logging.info(f'Skipping stagger for {j.name}. Stagger is larger than minimum_minutes_between_jobs. '
                                  f'Min: {minimum_stagger}, Current: {next_job_work[j.name]}')
+                    logging.info(f'Job name 267: {job.name}')
+                    logging.info(f'Job total kicked off: {job.total_kicked_off}')
+                    logging.info(f'Job max to kick off: {job.max_plots}')
+                    logging.info(f'Resume: {job.resume_plots}')
                     continue
                 logging.info(f'Setting a new stagger for {j.name}. minimum_minutes_between_jobs is larger than assigned '
                              f'stagger. Min: {minimum_stagger}, Current: {next_job_work[j.name]}')
@@ -312,6 +331,7 @@ def start_work(job, chia_location, log_directory, drives_free_space):
         chia_location=chia_location,
         farmer_public_key=job.farmer_public_key,
         pool_public_key=job.pool_public_key,
+        pool_contract_address=job.pool_contract_address,
         size=job.size,
         memory_buffer=job.memory_buffer,
         temporary_directory=temporary_directory,
